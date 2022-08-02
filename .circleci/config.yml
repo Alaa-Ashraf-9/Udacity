@@ -2,37 +2,38 @@
 jobs:
   build-frontend:
     docker:
-      - image: circleci/node:13.8.0
+      - image: cimg/node:13.8.0
     steps:
       - checkout
       - restore_cache:
-          keys: [frontend-build]
+          keys: [frontend-depend]
       - run:
           name: Build front-end
           working_directory: ./frontend
           command: |
-            npm i
+            cd frontend
+            npm install
             npm run build
-            pwd && ls -al
+            
       - save_cache:
           paths: [frontend/node_modules]
-          key: frontend-build
+          key: frontend-depend
 
   build-backend:
     docker:
-      - image: circleci/node:13.8.0
+      - image: cimg/node:13.8.0
     steps:
       - checkout
       - restore_cache:
-          keys: [backend-build]
+          keys: [backend-depend]
       - run:
           name: Back-end build
           working_directory: ./backend
           command: |
-            npm i
+            cd backend
+            npm install 
             npm run build
-            cp .env dist/.env
-            pwd && ls -al
+            
       - persist_to_workspace:
           root: ~/
           paths:
@@ -40,34 +41,36 @@ jobs:
             - project/backend/node_modules
       - save_cache:
           paths: [backend/node_modules]
-          key: backend-build
+          key: backend-depend
 
   test-frontend:
     docker:
-      - image: circleci/node:13.8.0
+      - image: cimg/node:13.8.0
     steps:
       - checkout
       - restore_cache:
-          keys: [frontend-build]
+          keys: [frontend-depend]
       - run:
           name: test-frontend
           working_directory: ./frontend
           command: |
-            npm i
+            cd frontend
+            npm install
             npm run test
   test-backend:
     docker:
-      - image: circleci/node:13.8.0
+      - image: cimg/node:13.8.0
     steps:
       - checkout
       - restore_cache:
-          keys: [backend-build]
+          keys: [backend-depend]
       - run:
           name: test-backend
           working_directory: ./backend
           command: |
-            npm i
-            npm run test
+            cd backend
+            npm install 
+            npm test
 #
 workflows:
   default:
