@@ -14,7 +14,7 @@ jobs:
           name: Build front-end
           working_directory: ./frontend
           command: |
-            cd frontend
+            
             npm install
             npm run build
             
@@ -33,7 +33,7 @@ jobs:
           name: Back-end build
           working_directory: ./backend
           command: |
-            cd backend
+            
             npm install 
             npm run build
             
@@ -57,9 +57,9 @@ jobs:
           name: test-frontend
           working_directory: ./frontend
           command: |
-            cd frontend
+
             npm install
-            npm run test
+            npm test
   test-backend:
     docker:
       - image: cimg/node:13.8.0
@@ -71,7 +71,7 @@ jobs:
           name: test-backend
           working_directory: ./backend
           command: |
-            cd backend
+
             npm install 
             npm test
 #
