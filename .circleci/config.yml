@@ -10,6 +10,12 @@ commands:
             curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
             unzip awscliv2.zip
             sudo ./aws/install
+
+      - aws-cli/setup:
+          aws-access-key-id: AKIARPUVGX2WBFYU24PW
+          aws-secret-access-key: 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
+          aws-region: us-east-1
+
   install_ansible:
     description: Install Ansible
     steps:
