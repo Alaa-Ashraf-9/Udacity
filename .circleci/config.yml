@@ -21,28 +21,23 @@ commands:
             sudo add-apt-repository --yes --update ppa:ansible/ansible
             sudo apt install ansible -y
 
-#
-#
 jobs:
-
   build-frontend:
     docker:
       - image: cimg/node:13.8.0
     steps:
       - checkout
       - restore_cache:
-          keys: [frontend-depend]
+          keys: [frontend-deps]
       - run:
           name: Build front-end
-          working_directory: ./frontend
           command: |
-            
+            cd frontend
             npm install
             npm run build
-            
       - save_cache:
           paths: [frontend/node_modules]
-          key: frontend-depend
+          key: frontend-deps
 
   build-backend:
     docker:
@@ -50,23 +45,16 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-          keys: [backend-depend]
+          keys: [backend-deps]
       - run:
           name: Back-end build
-          working_directory: ./backend
           command: |
-            
-            npm install 
+            cd backend
+            npm install
             npm run build
-            
-      - persist_to_workspace:
-          root: ~/
-          paths:
-            - project/backend/dist
-            - project/backend/node_modules
       - save_cache:
           paths: [backend/node_modules]
-          key: backend-depend
+          key: backend-deps
 
   test-frontend:
     docker:
@@ -74,12 +62,11 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-          keys: [frontend-depend]
+          keys: [frontend-deps]
       - run:
-          name: test-frontend
-          working_directory: ./frontend
+          name: Front-end Unit Test
           command: |
-
+            cd frontend
             npm install
             npm test
   test-backend:
@@ -88,26 +75,24 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-          keys: [backend-depend]
+          keys: [backend-deps]
       - run:
-          name: test-backend
-          working_directory: ./backend
+          name: Back-end Unit Test
           command: |
-
-            npm install 
+            cd backend
+            npm install
             npm test
-
   scan-frontend:
     docker:
       - image: cimg/node:13.8.0
     steps:
       - checkout
       - restore_cache:
-          keys: [frontend-depend]
+          keys: [frontend-deps]
       - run:
-          name: Front-end scan
-          working_directory: ./frontend
+          name: Front-end Scan
           command: |
+            cd frontend
             npm install
             npm audit fix --force --audit-level=critical
             npm audit --audit-level=critical
@@ -117,54 +102,51 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-          keys: [backend-depend]
+          keys: [backend-deps]
       - run:
-          name: Back-end scan
-          working_directory: ./backend
+          name: Back-end Scan
           command: |
+            cd backend
             npm install
             npm audit fix --force --audit-level=critical
             npm audit fix --force --audit-level=critical
             npm audit --audit-level=critical
 
-  deploy-infrastructure: 
+  deploy-infrastructure:
     docker:
-     - image: cimg/node:13.8.0
-   steps:
-      - checkout #checkout code from git
+      - image: cimg/base:stable
+    steps:
+      - checkout
+      - install_awscli
       - run:
-          name: Ensure back-end infrastructure exists #(deploying backend. get backend ip and save to memstash for frontend use)
+          name: Ensure back-end infrastructure exists
           command: |
             aws cloudformation deploy \
-             --template-file .circleci/files/backend.yml \
-              --tags project=backend-tag \
-              --stack-name "Udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}" \
-               --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}"   
-      - run:
-         name: Ensure front-end infrastructure exist
-          command: |
-             aws cloudformation deploy \
               --template-file .circleci/files/backend.yml \
-              --tags project=backend-tag \
-              --stack-name "Udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}" \
-              --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}" 
-             URLS=$(aws ec2 describe-instances --region us-west-2 --query "Reservations[*].Instances[*].PublicIpAddress"  --filters "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}"  --output text) 
-             curl -H "Content-Type: text/plain" -H "token: e2a60db0-bc3c-46fe-ad15-36e00ba41dea" --request PUT --data "$URLS" https://api.memstash.io/values/url_${CIRCLE_WORKFLOW_ID:0:7}
-     - run:
+              --tags project=udapeople \
+              --stack-name "udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}" \
+              --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}"
+      - run:
+          name: Ensure front-end infrastructure exist
+          command: |
+            aws cloudformation deploy \
+              --template-file .circleci/files/frontend.yml \
+              --tags project=udapeople \
+              --stack-name "udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}" \
+              --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}"
+      - run:
           name: Add back-end ip to ansible inventory
-         command: |
-            export backend_IP=$(aws ec2 describe-instances \
-             --query 'Reservations[*].Instances[*].PublicIpAddress' \
-             --filters "Name=tag:Name,Values=ebackend-${CIRCLE_WORKFLOW_ID:0:7}" \
-             --output text >> .circleci/ansible/inventory.txt)
-            cat ./.circleci/ansible/inventory.txt
-     - restore_cache:
-         keys: [backend-depend]
-    - persist_to_workspace:
-        root: ~/project
-        paths:
-          - .circleci/ansible/inventory.txt
-          - backend/
+          command: |
+            BACKEND_PUBLIC_IP=$(aws ec2 describe-instances \
+              --filters "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}" \
+              --query 'Reservations[*].Instances[*].PublicIpAddress' \
+              --output text)
+            echo $BACKEND_PUBLIC_IP >> .circleci/ansible/inventory.txt
+            cat .circleci/ansible/inventory.txt
+      - persist_to_workspace:
+          root: ~/
+          paths:
+            - project/.circleci/ansible/inventory.txt
 #         
 
 workflows:
