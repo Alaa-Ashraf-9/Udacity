@@ -136,11 +136,9 @@ jobs:
 
     deploy-infrastructure: 
      docker:
-       - image: amazon/aws-cli
+       - image: cimg/node:13.8.0
      steps:
        - checkout #checkout code from git
-       - run: yum install -y tar #(install dependencies)
-       - run: yum install -y gzip #(install dependencies)
        - run:
            name: Ensure back-end infrastructure exists #(deploying backend. get backend ip and save to memstash for frontend use)
            command: |
@@ -167,22 +165,8 @@ jobs:
                --filters "Name=tag:Name,Values=ebackend-${CIRCLE_WORKFLOW_ID:0:7}" \
                --output text >> .circleci/ansible/inventory.txt)
                cat ./.circleci/ansible/inventory.txt
-       - run:
-           name: Add .env vars to backend distro
-           command: |
-             echo ENVIRONMENT=development > backend/.env
-             echo TYPEORM_CONNECTION=postgres >> backend/.env
-             echo TYPEORM_ENTITIES=./src/modules/domain/**/*.entity.ts >> backend/.env
-             echo TYPEORM_HOST=$TYPEORM_HOST >> backend/.env
-             echo TYPEORM_PORT=$TYPEORM_PORT >> backend/.env
-             echo TYPEORM_USERNAME=$TYPEORM_USERNAME >> backend/.env
-             echo TYPEORM_PASSWORD=$TYPEORM_PASSWORD >> backend/.env
-             echo TYPEORM_DATABASE=$TYPEORM_DATABASE >> backend/.env
-             echo TYPEORM_MIGRATIONS=./src/migrations/*.ts >> "backend/.env"
-             echo TYPEORM_MIGRATIONS_DIR=./src/migrations >> "backend/.env"
-             echo NODE_ENV=development >> "backend/.env"
        - restore_cache:
-           keys: [backend-build]
+           keys: [backend-depend]
        - persist_to_workspace:
            root: ~/project
            paths:
