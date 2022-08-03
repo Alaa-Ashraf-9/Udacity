@@ -133,44 +133,44 @@ jobs:
             npm audit fix --force --audit-level=critical
             npm audit --audit-level=critical
 
-    deploy-infrastructure: 
-     docker:
-       - image: cimg/node:13.8.0
-     steps:
-       - checkout #checkout code from git
-       - run:
-           name: Ensure back-end infrastructure exists #(deploying backend. get backend ip and save to memstash for frontend use)
-           command: |
-             aws cloudformation deploy \
-               --template-file .circleci/files/backend.yml \
-               --tags project=backend-tag \
-               --stack-name "Udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}" \
+  deploy-infrastructure: 
+    docker:
+     - image: cimg/node:13.8.0
+   steps:
+      - checkout #checkout code from git
+      - run:
+          name: Ensure back-end infrastructure exists #(deploying backend. get backend ip and save to memstash for frontend use)
+          command: |
+            aws cloudformation deploy \
+             --template-file .circleci/files/backend.yml \
+              --tags project=backend-tag \
+              --stack-name "Udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}" \
                --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}"   
-       - run:
-           name: Ensure front-end infrastructure exist
-           command: |
-              aws cloudformation deploy \
-               --template-file .circleci/files/backend.yml \
-               --tags project=backend-tag \
-               --stack-name "Udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}" \
-               --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}" 
-               URLS=$(aws ec2 describe-instances --region us-west-2 --query "Reservations[*].Instances[*].PublicIpAddress"  --filters "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}"  --output text) 
-               curl -H "Content-Type: text/plain" -H "token: e2a60db0-bc3c-46fe-ad15-36e00ba41dea" --request PUT --data "$URLS" https://api.memstash.io/values/url_${CIRCLE_WORKFLOW_ID:0:7}
-       - run:
-           name: Add back-end ip to ansible inventory
-           command: |
-              export backend_IP=$(aws ec2 describe-instances \
-               --query 'Reservations[*].Instances[*].PublicIpAddress' \
-               --filters "Name=tag:Name,Values=ebackend-${CIRCLE_WORKFLOW_ID:0:7}" \
-               --output text >> .circleci/ansible/inventory.txt)
-               cat ./.circleci/ansible/inventory.txt
-       - restore_cache:
-           keys: [backend-depend]
-       - persist_to_workspace:
-           root: ~/project
-           paths:
-             - .circleci/ansible/inventory.txt
-             - backend/
+      - run:
+         name: Ensure front-end infrastructure exist
+          command: |
+             aws cloudformation deploy \
+              --template-file .circleci/files/backend.yml \
+              --tags project=backend-tag \
+              --stack-name "Udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}" \
+              --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}" 
+             URLS=$(aws ec2 describe-instances --region us-west-2 --query "Reservations[*].Instances[*].PublicIpAddress"  --filters "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}"  --output text) 
+             curl -H "Content-Type: text/plain" -H "token: e2a60db0-bc3c-46fe-ad15-36e00ba41dea" --request PUT --data "$URLS" https://api.memstash.io/values/url_${CIRCLE_WORKFLOW_ID:0:7}
+     - run:
+          name: Add back-end ip to ansible inventory
+         command: |
+            export backend_IP=$(aws ec2 describe-instances \
+             --query 'Reservations[*].Instances[*].PublicIpAddress' \
+             --filters "Name=tag:Name,Values=ebackend-${CIRCLE_WORKFLOW_ID:0:7}" \
+             --output text >> .circleci/ansible/inventory.txt)
+            cat ./.circleci/ansible/inventory.txt
+     - restore_cache:
+         keys: [backend-depend]
+    - persist_to_workspace:
+        root: ~/project
+        paths:
+          - .circleci/ansible/inventory.txt
+          - backend/
 #         
 
 workflows:
