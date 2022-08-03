@@ -24,13 +24,6 @@ commands:
 #
 #
 jobs:
-  setup_aws_cli:
-    executor: aws-cli/default
-    steps:
-      - aws-cli/setup:
-          aws-access-key-id: AKIARPUVGX2WBFYU24PW
-          aws-secret-access-key: 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
-          aws-region: us-east-1
   build-frontend:
     docker:
       - image: cimg/node:13.8.0
