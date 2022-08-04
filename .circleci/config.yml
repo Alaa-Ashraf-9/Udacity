@@ -48,9 +48,8 @@ jobs:
           name: Build front-end
           working_directory: ./frontend
           command: |
-            npm i
+            npm install
             npm run build
-            pwd && ls -al
       - save_cache:
           paths: [frontend/node_modules]
           key: frontend-build
@@ -66,10 +65,9 @@ jobs:
           name: Back-end build
           working_directory: ./backend
           command: |
-            npm i
+            npm install
             npm run build
-            cp .env dist/.env
-            pwd && ls -al
+
       - persist_to_workspace:
           root: ~/
           paths:
