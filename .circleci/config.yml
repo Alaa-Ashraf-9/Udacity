@@ -116,7 +116,8 @@ jobs:
           name: Front-end scan
           working_directory: ./frontend
           command: |
-            npm i
+            npm install
+            npm audit fix --force --audit-level=critical
             npm audit --audit-level=critical
   scan-backend:
     docker:
@@ -129,7 +130,9 @@ jobs:
           name: Back-end scan
           working_directory: ./backend
           command: |
-            npm i
+            npm install
+            npm audit fix --force --audit-level=critical
+            npm audit fix --force --audit-level=critical
             npm audit --audit-level=critical
   deploy-infrastructure:
     docker:
