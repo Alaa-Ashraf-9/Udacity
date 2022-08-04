@@ -4,7 +4,7 @@ commands:
   install_awscli:
     description: Install AWS CLI v2
     steps:
-      - run:
+      - run:export AWS_REGION=
           name: Install AWS CLI v2
           command: |
             curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
@@ -177,7 +177,7 @@ jobs:
               --tags project=udapeople \
               --stack-name "udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}" \
               --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}" \
-              --region="${AWS_DEFAULT_REGION}"
+              --region "us-east-1"
       - run:
           name: Ensure front-end infrastructure exist
           command: |
