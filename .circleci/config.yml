@@ -222,14 +222,14 @@ jobs:
           name: Run migrations
           command: |
             cd backend
-            npm install
-            npm install typescript -g
+            npm install -y
+            npm install typescript -g 
 
-            npm run build
-            npm audit 
-            npm audit fix
-            npm audit fix --force
-            npm run migrations > migrations_dump.txt
+            sudo npm run build
+            sudo npm audit 
+            sudo npm audit fix
+            sudo npm audit fix --force
+            sudo npm run migrations > migrations_dump.txt
       - run:
           name: Send migration status to kvdb.io
           command: |
