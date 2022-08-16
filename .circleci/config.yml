@@ -225,7 +225,7 @@ jobs:
           working_directory: ./backend  
           no_output_timeout: 7m        
           command: |
-            sudo chown -R udapeople.circleci /usr/local/lib/node_modules
+            sudo chmod -R 777 /usr/local/lib/node_modules
             cd backend
             npm install -y
             sudo npm run build
