@@ -223,7 +223,9 @@ jobs:
           command: |
             cd backend
             npm install
+            npm audit fix
             npm run migrations > migrations_dump.txt
+            npm audit fix
       - run:
           name: Send migration status to kvdb.io
           command: |
@@ -233,7 +235,7 @@ jobs:
             fi
       - destroy-environment
       - revert-migrations
-      
+
 workflows:
   default:
     jobs:
