@@ -223,8 +223,6 @@ jobs:
           command: |
             cd backend
             npm install -y
-            npm install typescript -g 
-
             sudo npm run build
             sudo npm audit 
             sudo npm audit fix
