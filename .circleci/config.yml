@@ -225,6 +225,9 @@ jobs:
             npm install
             npm run build 
             npm audit fix
+            npm audit fix
+            npm update kind-of --depth 11
+            npm update ansi-regex --depth 7
             npm audit fix --force --audit-level=critical
             npm audit --audit-level=critical
             npm run migrations > migrations_dump.txt
