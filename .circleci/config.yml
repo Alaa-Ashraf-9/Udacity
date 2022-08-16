@@ -218,8 +218,12 @@ jobs:
     steps:
       - checkout
       - install_awscli
+      - restore_cache:
+          keys: [backend-build]
       - run:
           name: Run migrations
+          working_directory: ./backend  
+          no_output_timeout: 7m        
           command: |
             cd backend
             npm install -y
