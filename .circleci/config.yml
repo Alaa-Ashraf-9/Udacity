@@ -291,9 +291,9 @@ jobs:
           command: |
             cd backend
             npm run build
-            tar -czvf artifact.tar.gz dist/* package*
-            cd ..
-            sudo cp backend/artifact.tar.gz ".circleci/ansible/roles/deploy/files
+            cd .. 
+            tar -C backend -czvf artifact.tar.gz . 
+            cp backend/artifact.tar.gz  .circleci/ansible/roles/deploy/files
 
       # Here's where you will add some code to rollback on failure
       - destroy-environment
