@@ -290,10 +290,17 @@ jobs:
           name: Package Backend
           command: |
             cd backend
+            npm install 
             npm run build
-            tar -czf artifact.tar.gz dist/* package*
-            cd ..
-            cp backend/artifact.tar.gz .circleci/ansible/roles/deploy/files
+            cd .. 
+            tar -C backend -cvzf artifact.tar.gz .
+            mkdir -p ~/project/.circleci/ansible/roles/deploy/files/
+            mv artifact.tar.gz .circleci/ansible/roles/deploy/files/artifact.tar.gz 
+            cd /.circleci/ansible 
+            echo "Contents of the inventory.txt file is ......$(tail -1 inventory.txt)"
+            cat inventory.txt
+            ansible-playbook -i inventory.txt deploy-backend.yml
+
       - run:
           name: Deploy backend
           command: |
