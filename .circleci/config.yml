@@ -294,8 +294,8 @@ jobs:
             cd .. 
             tar -C backend -czvf artifact.tar.gz . 
             mkdir -p ~/udacity/.circleci/ansible/roles/deploy/files/
-            cd .circleci/ansible/roles/deploy/files/
-            cp artifact.tar.gz .circleci/ansible/roles/deploy/files/artifact.tar.gz 
+            cd ~/project/.circleci/ansible/roles/deploy/files/
+            cp artifact.tar.gz ~/project/.circleci/ansible/roles/deploy/files/artifact.tar.gz 
 
 
       # Here's where you will add some code to rollback on failure
