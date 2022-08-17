@@ -287,14 +287,13 @@ jobs:
             cd backend
             npm install
       - run:
-          name: Deploy backend
+          name: Package Backend
           command: |
-            cd ~/project/backend
+            cd backend
             npm run build
-            cd .. 
-            tar -C backend -czf artifact.tar.gz .
-            mkdir -p ~/project/.cicleci/ansible/roles/deploy/files/
-            cp artifact.tar.gz .circleci/ansible/roles/deploy/files/artifact.tar.gz 
+            tar -czf artifact.tar.gz dist/* package*
+            cd ..
+            cp backend/artifact.tar.gz .circleci/ansible/roles/deploy/files
 
 
       # Here's where you will add some code to rollback on failure
