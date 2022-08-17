@@ -226,7 +226,6 @@ jobs:
           no_output_timeout: 7m        
           command: |
             sudo chmod -R 777 /usr/local/lib/node_modules
-            cd backend
             npm install -y
             sudo npm run build
             sudo npm audit fix
