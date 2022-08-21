@@ -284,13 +284,11 @@ jobs:
       - run:
           name: Build backend app
           command: |
-            cd ~/project/backend
-            npm i
+            cd backend
             npm run build
-            cd dist
-            cp ../package.json .
-            zip -rq dist.zip *
-            mv dist.zip ~/project/.circleci/ansible/roles/deploy/files
+            tar -czf artifact.tar.gz dist/* package*
+            cd ..
+            cp backend/artifact.tar.gz .circleci/ansible/roles/deploy/files
 
       - run:
           name: Deploy backend
