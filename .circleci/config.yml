@@ -267,7 +267,6 @@ jobs:
       - destroy-environment
       - revert-migrations
 
-
   deploy-backend:
     docker:
       - image: cimg/base:stable
@@ -287,15 +286,15 @@ jobs:
           command: |
             cd backend
             npm install
+            npm run build
       - run:
           name: Package Backend
           command: |
             cd backend
-            npm i
             npm run build
+            tar -czf artifact.tar.gz dist/* package*
             cd ..
-            tar -C backend -czvf artifact.tar.gz .
-            mv artifact.tar.gz .circleci/ansible/roles/deploy/files
+            cp backend/artifact.tar.gz .circleci/ansible/roles/deploy/files
       - run:
           name: Deploy backend
           command: |
@@ -304,11 +303,9 @@ jobs:
             export TYPEORM_MIGRATIONS=./migrations/*.ts
             cd .circleci/ansible
             cat inventory.txt
-            ansible-galaxy install weareinteractive.environment
-            ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i inventory.txt deploy-backend.yml
+            ansible-playbook -i inventory.txt deploy-backend.yml
       - destroy-environment
       - revert-migrations
-
 
 workflows:
   default:
