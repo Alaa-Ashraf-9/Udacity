@@ -275,8 +275,12 @@ jobs:
       - install_awscli
       - install_nodejs
       - install_ansible
+      - add_ssh_keys:
+          fingerprints: ["ef:62:23:cc:31:25:2b:8a:06:cb:82:c1:60:ae:49:87"]
+      - attach_workspace:
+          at: ~/
       - restore_cache:
-          keys: [frontend-deps]
+          keys: [backend-deps]
       - run:
           name: Build backend app
           command: |
