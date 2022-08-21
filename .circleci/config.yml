@@ -274,6 +274,7 @@ jobs:
       - checkout
       - install_awscli
       - install_nodejs
+      - install_ansible
       - restore_cache:
           keys: [frontend-deps]
       - run:
