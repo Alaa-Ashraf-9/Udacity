@@ -292,9 +292,6 @@ jobs:
             cd backend
             npm install 
             npm run build
-            apk add --update ansible rsync 
-            apk add curl
-            pip3 install awscli
             cd ..
             tar -C backend -cvzf artifact.tar.gz .
             cp artifact.tar.gz .circleci/ansible/roles/deploy/files/artifact.tar.gz
