@@ -305,7 +305,6 @@ jobs:
             cd .circleci/ansible
             cat inventory.txt
             npm install 
-            npm run build
             ansible-playbook -i inventory.txt deploy-backend.yml
       - destroy-environment
       - revert-migrations
