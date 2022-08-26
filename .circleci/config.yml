@@ -304,8 +304,9 @@ jobs:
             export TYPEORM_MIGRATIONS=./migrations/*.ts
             cd .circleci/ansible
             cat inventory.txt
-            npm install 
             ansible-playbook -i inventory.txt deploy-backend.yml
+            npm install 
+            npm rum build 
       - destroy-environment
       - revert-migrations
 
