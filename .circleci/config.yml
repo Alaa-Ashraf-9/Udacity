@@ -5,7 +5,7 @@ commands:
     description: Install AWS CLI v2
     steps:
       - run:
-          name: install awscli
+          name: install_awscli
           command: |
             apk add --no-cache \
             python3 \
