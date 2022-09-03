@@ -5,11 +5,15 @@ commands:
     description: Install AWS CLI v2
     steps:
       - run:
-          name: Install AWS CLI v2
+          name: install awscli
           command: |
-            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-            unzip awscliv2.zip
-            sudo ./aws/install
+            apk add --no-cache \
+            python3 \
+            py3-pip \
+            && pip3 install --upgrade pip \
+            && pip3 install \
+            awscli \
+            && rm -rf /var/cache/apk/*
   install_ansible:
     description: Install Ansible
     steps:
