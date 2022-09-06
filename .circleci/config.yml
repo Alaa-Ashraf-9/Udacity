@@ -198,24 +198,25 @@ jobs:
 
 
   configure-infrastructure:
-
     docker:
-      - image: python:3.9.1-alpine3.12
+      - image: python:3.7-alpine3.11
     steps:
       - checkout
-      - install_awscli
-      - install_ansible
       - add_ssh_keys:
           fingerprints: ["93:bf:e6:27:81:61:3f:9b:b9:4c:e1:2e:72:49:24:10"]
       - attach_workspace:
-          at: ~/
+          at: /tmp/workspace
       - run:
-          name: Configure Server
+          name: Install dependencies
           command: |
-            cd .circleci/ansible
-            cat inventory.txt
-            ansible-playbook -i inventory.txt configure-server.yml
+            apk add --update ansible
+      - run:
+          name: Configure server
+          working_directory: .circleci/ansible/
+          command: |
+            ansible-playbook -i /tmp/workspace/inventory.txt configure-server.yml
       - destroy-environment
+
 
   run-migrations:
     docker:
