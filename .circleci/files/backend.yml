@@ -25,6 +25,10 @@ Resources:
           FromPort: 9100
           ToPort: 9100
           CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 0
+          ToPort: 65536
+          CidrIp: 0.0.0.0/0
  
 
 
