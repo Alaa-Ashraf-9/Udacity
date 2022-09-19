@@ -292,6 +292,7 @@ jobs:
           name: Deploy backend
           working_directory: backend
           command: |
+            npm install typescript 
             npm run build
             cd ..
             tar -C backend -czvf artifact.tar.gz .
