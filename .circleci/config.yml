@@ -196,23 +196,25 @@ jobs:
 
       - destroy-environment
 
+
   configure-infrastructure:
     docker:
-      - image: cimg/base:stable
+      - image: python:3.7-alpine3.11
     steps:
       - checkout
-      - install_awscli
-      - install_ansible
       - add_ssh_keys:
           fingerprints: ["93:bf:e6:27:81:61:3f:9b:b9:4c:e1:2e:72:49:24:10"]
       - attach_workspace:
           at: ~/
       - run:
-          name: Configure Server
+          name: Install dependencies
           command: |
-            cd .circleci/ansible
-            cat inventory.txt
-            ansible-playbook -i inventory.txt configure-server.yml
+            apk add --update ansible
+      - run:
+          name: Configure server
+          working_directory: .circleci/ansible/
+          command: |
+            ansible-playbook -i /tmp/workspace/inventory.txt configure-server.yml
       - destroy-environment
 
   run-migrations:
@@ -321,38 +323,7 @@ jobs:
       - destroy-environment
       - revert-migrations
 
-  smoke-test:
-    docker:
-      - image: cimg/base:stable
-    steps:
-      - checkout
-      - attach_workspace:
-          at: /tmp/workspace
-      - run:
-          name: Backend smoke test.
-          command: |
-            export BACKEND_IP=$(sed -n '2p' /tmp/workspace/inventory.txt)
-            export API_URL="http://${BACKEND_IP}:3030"
-            echo "${API_URL}"
-            if curl "${API_URL}/api/status" | grep "ok"
-            then
-              exit 0
-            else
-              exit 1
-            fi
-      - run:
-          name: Frontend smoke test.
-          command: |
-            URL="http://udapeople-${CIRCLE_WORKFLOW_ID:0:7}.s3-website-us-east-1.amazonaws.com/#/employees"
-            echo ${URL}
-            if curl -s ${URL} | grep "Welcome"
-            then
-              exit 0
-            else
-              exit 1
-            fi
-      - destroy-environment
-      - revert-migrations
+
 
 workflows:
   default:
@@ -382,5 +353,3 @@ workflows:
           requires: [run-migrations]
       - deploy-backend:
           requires: [run-migrations]
-      - smoke-test:
-          requires: [deploy-backend, deploy-frontend]
