@@ -271,30 +271,27 @@ jobs:
       - destroy-environment
       - revert-migrations
 
-  deploy-backend:
+   deploy-backend: 
     docker:
-      - image: cimg/base:stable
+      - image: python:3.7-alpine3.11
     steps:
       - checkout
-      - install_awscli
-      - install_ansible
-      - install_nodejs
+      # Add ssh keys with fingerprint
       - add_ssh_keys:
           fingerprints: ["93:bf:e6:27:81:61:3f:9b:b9:4c:e1:2e:72:49:24:10"]
+      # attach workspace
       - attach_workspace:
           at: ~/
-      - run:
-          name: Install dependencies
-          command: |
-            sudo apt update
-            sudo apt install software-properties-common -y
-            sudo add-apt-repository --yes --update ppa:ansible/ansible
-            sudo apt install ansible -y
       - restore_cache:
           keys: [backend-deps]
       - run:
+          name: Install dependencies
+          command: |
+            apk add --update tar gzip ansible nodejs npm curl openssh-client
+            pip install awscli
+      - run:
           name: Deploy backend
-          working_directory: backend
+          no_output_timeout: 30m
           command: |
             npm install 
             npm run build
