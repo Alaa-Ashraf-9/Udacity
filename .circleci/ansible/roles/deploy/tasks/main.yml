@@ -8,18 +8,21 @@
   unarchive:
     src: ../../artifact.tar.gz
     dest: ~/backend
+    remote_src: yes
+
 - name: "Installing Node Dependencies"
   shell: |
     cd ~/backend
     npm install
     npm run 
 
-- name: Start PM2
+- name: "Executing Node app with PM2"
   shell: |
-    cd ~/backend/dist
+    cd ~/backend-app/dist
+    pm2 stop default
     pm2 start main.js
-- name:  start app
-  command:  pm2 start main.js
+  register: execute_node
+
   args:
     chdir: ~/backend/dist
   environment:
