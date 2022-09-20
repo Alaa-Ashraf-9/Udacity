@@ -310,7 +310,8 @@ jobs:
             npm install typescript
             npm run build
             tar -czf artifact.tar.gz dist/* package*
-            pwd
+            pwd 
+            ls -ls ~/root/project/backend/
             cd ..
             cp backend/artifact.tar.gz .circleci/ansible/roles/deploy/files
       - run:
