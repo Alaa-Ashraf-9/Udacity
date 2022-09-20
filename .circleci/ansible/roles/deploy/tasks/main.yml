@@ -8,11 +8,11 @@
   unarchive:
     src: ../../artifact.tar.gz
     dest: ~/backend
-
-- name: Start PM2
+- name: "Installing Node Dependencies"
   shell: |
-    cd ~/backend/dist
-    pm2 start main.js
+    cd ~/backend
+    npm install
+    npm run 
 
 - name: Start PM2
   shell: |
