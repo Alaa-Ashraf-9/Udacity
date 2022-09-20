@@ -24,6 +24,8 @@
     pm2 start main.js
   register: execute_node
 
+- name:  start app
+  command:  pm2 start main.js
   args:
     chdir: ~/backend/dist
   environment:
