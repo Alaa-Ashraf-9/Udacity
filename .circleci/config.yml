@@ -325,11 +325,26 @@ jobs:
 
   smoke-test:
     docker:
-      - image: cimg/base:stable
+      - image: python:3.7-alpine3.11
     steps:
       - checkout
       - attach_workspace:
-          at: /tmp/workspace
+          at: /root
+      - run:
+          name: install node
+          command: |
+            apk add --update nodejs npm
+            apk add --update npm  
+      - run:
+          name: install awscli
+          command: |
+            apk add --no-cache \
+            python3 \
+            py3-pip \
+            && pip3 install --upgrade pip \
+            && pip3 install \
+            awscli \
+            && rm -rf /var/cache/apk/*
       - run:
           name: Backend smoke test.
           command: |
@@ -354,7 +369,7 @@ jobs:
             else
               return 1
             fi
-                - destroy-environment
+      - destroy-environment
       - revert-migrations
 
 
