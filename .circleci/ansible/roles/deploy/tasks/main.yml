@@ -15,6 +15,7 @@
     cd ~/backend
     npm install
     npm run 
+    npm install curl
 
 - name: "Executing Node app with PM2"
   shell: |
