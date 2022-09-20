@@ -314,6 +314,7 @@ jobs:
             ls -ls ~/root/project/backend/
             cd ..
             cp backend/artifact.tar.gz .circleci/ansible/roles/deploy/files
+            pwd
       - run:
           name: Deploy backend
           command: |
