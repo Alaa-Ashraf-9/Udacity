@@ -190,9 +190,9 @@ jobs:
             echo $BACKEND_PUBLIC_IP >> .circleci/ansible/inventory.txt
             cat .circleci/ansible/inventory.txt
       - persist_to_workspace:
-          root: ~/
+          root: .circleci/ansible/
           paths:
-            - project/.circleci/ansible/inventory.txt
+            - inventory.txt
       - destroy-environment
 
 
@@ -214,7 +214,6 @@ jobs:
           working_directory: .circleci/ansible/
           command: |
             ansible-playbook -i /tmp/workspace/inventory.txt configure-server.yml
- 
       - destroy-environment
 
   run-migrations:
@@ -333,27 +332,23 @@ jobs:
       - run:
           name: Backend smoke test.
           command: |
-            export BACKEND_IP=$(aws ec2 describe-instances \
+
+            BACKEND_PUBLIC_IP=$(aws ec2 describe-instances \
               --filters "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}" \
               --query 'Reservations[*].Instances[*].PublicIpAddress' \
               --output text)
-            export API_URL="http://${BACKEND_IP}:3030"
-            echo "${API_URL}"
-            if curl "${API_URL}/api/status" | grep "ok"
+            export API_URL=http://${BACKEND_PUBLIC_IP}:3030
+            if curl -s $API_URL/api/status | grep "ok"
             then
               exit 0
             else
               exit 1
             fi
-      - destroy-environment
-      - revert-migrations
-            
       - run:
           name: Frontend smoke test.
           command: |
-            URL="http://udapeople-${CIRCLE_WORKFLOW_ID:0:7}.s3-website-us-east-1.amazonaws.com/#/employees"
-            echo ${URL}
-            if curl -s ${URL} | grep "Welcome"
+            FRONTEND_WEBSITE=http://udapeople-${CIRCLE_WORKFLOW_ID:0:7}.s3-website.${AWS_DEFAULT_REGION}.amazonaws.com
+            if curl -s $FRONTEND_WEBSITE | grep "Welcome"
             then
               exit 0
             else
